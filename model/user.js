@@ -1,11 +1,10 @@
-import { number, string } from "joi";
 import mongoose from "mongoose";
 
 const userModel = new mongoose.Schema({
-    id: { type : number},
-    username: { type: string},
-    age: { type: number },
+    id: { type : Number},
+    username: { type: String},
+    age: { type: Number },
     hobbies: { type: []}
 })
 
-export default mongoose.models.user || mongoose.model('user', userModel);
+export default mongoose.models.User || mongoose.model('User', userModel);
