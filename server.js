@@ -77,30 +77,52 @@ app.post('/api/users', (req,res) => {
 })
 
 app.put('/api/users/:id', (req,res) => {
-    try {
-        User.findOneAndReplace({_id: req.params.id}, req.body).then(data => {
-            res.status(200);
-            res.json({mesg: 'User updated successfully.'});
-        }).catch(error => {
+    if (req.params.id && mongoose.Types.ObjectId.isValid(req.params.id)) {
+        try {
+            User.findOneAndReplace({_id: req.params.id}, req.body).then(data => {
+                if (data === null) {
+                    res.status(404);
+                    res.json({msg: `User doesn't exist`})
+                } else {
+                    res.status(200);
+                    res.json({mesg: 'User updated successfully.'});
+                }
+            }).catch(error => {
+                res.status(500);
+                res.json({error})
+            })
+        } catch {
             res.status(500);
             res.json({error})
-        })
-    } catch {
-        res.status(500);
-        res.json({error})
+        }
+    } else { 
+        res.status(400);
+        res.json({msg: 'Invalid id'});
     }
 })
 
 app.delete('/api/users/:id', (req,res) => {
-    try {
-        User.deleteOne({_id: req.params.id}).then(data => {
-            res.status(200);
-            res.json({msg : 'User deleted successfully.'})
-        })
-    } catch (error) {
-        res.status(500);
-        res.json({error})
+    if (req.params.id && mongoose.Types.ObjectId.isValid(req.params.id)) {
+        try {
+            User.deleteOne({_id: req.params.id}).then(data => {
+                console.log(data);
+                if (!data.deletedCount) {
+                    res.status(404);
+                    res.json({msg: `User doesn't exist`})
+                } else {
+                    res.status(204);
+                    res.json({msg : 'User deleted successfully.'})
+                }
+            })
+        } catch (error) {
+            res.status(500);
+            res.json({error})
+        }
+    } else {
+        res.status(400);
+        res.json({msg: 'Invalid id'});
     }
+
 })
 
 
