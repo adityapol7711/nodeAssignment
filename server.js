@@ -130,6 +130,10 @@ function isIdValid(id) {
     return false;
 }
 
+app.use(function(req, res, next) {
+    res.status(404);
+    res.json({msg: 'Invalid URL'})
+});
 
 connect().then(() => {
     app.listen(port, () => {
