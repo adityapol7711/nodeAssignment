@@ -24,7 +24,7 @@ app.get('/api/users', (req, res) => {
 
 app.get('/api/users/:id', (req,res) => {
     try {
-        if (req.params.id && mongoose.Types.ObjectId.isValid(req.params.id)) {
+        if (isIdValid(req.params.id)) {
             User.findOne({_id: req.params.id}).then(data => {
                 if (data === null) {
                     res.status(404);
@@ -49,16 +49,15 @@ app.get('/api/users/:id', (req,res) => {
 
 app.post('/api/users', (req,res) => {
     try {
-        const user = new User({
-            username: req.body.username,
-            age: req.body.age,
-            hobbies: req.body.hobbies
-        });
-
         if (!req.body.username || !req.body.age || !req.body.hobbies) {
             res.status(400);
             res.json({msg: `Invlid request body`})
         } else {
+            const user = new User({
+                username: req.body.username,
+                age: req.body.age,
+                hobbies: req.body.hobbies
+            });
             user.save().then(data => {
                 res.status(201);
                 return res.json({
@@ -77,7 +76,7 @@ app.post('/api/users', (req,res) => {
 })
 
 app.put('/api/users/:id', (req,res) => {
-    if (req.params.id && mongoose.Types.ObjectId.isValid(req.params.id)) {
+    if (isIdValid(req.params.id)) {
         try {
             User.findOneAndReplace({_id: req.params.id}, req.body).then(data => {
                 if (data === null) {
@@ -102,7 +101,7 @@ app.put('/api/users/:id', (req,res) => {
 })
 
 app.delete('/api/users/:id', (req,res) => {
-    if (req.params.id && mongoose.Types.ObjectId.isValid(req.params.id)) {
+    if (isIdValid(req.params.id)) {
         try {
             User.deleteOne({_id: req.params.id}).then(data => {
                 console.log(data);
@@ -122,8 +121,14 @@ app.delete('/api/users/:id', (req,res) => {
         res.status(400);
         res.json({msg: 'Invalid id'});
     }
-
 })
+
+function isIdValid(id) {
+    if (id && mongoose.Types.ObjectId.isValid(id)) {
+        return true;
+    }
+    return false;
+}
 
 
 connect().then(() => {
